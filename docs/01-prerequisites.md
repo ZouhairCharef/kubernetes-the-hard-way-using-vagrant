@@ -1,6 +1,38 @@
 # Prerequisites
 
-## Machines ip address
+## K8S Cluster Architecture
+
+![image](https://user-images.githubusercontent.com/38728584/235473544-2480b964-a03c-45a2-975e-d78ab432900b.png)
+
+## Vagrant
+
+In this repo you well find a directory of the vagrant file.
+
+### Setup the machines
+
+Use the commands bellow:
+
+```
+cd vagrant/
+vagrant up
+```
+after all the VMs created you can list the status of each one:
+
+```
+vagrant status
+
+Current machine states:
+
+haproxy-lb                running (virtualbox)
+controller-0              running (virtualbox)
+controller-1              running (virtualbox)
+controller-2              running (virtualbox)
+worker-0                  running (virtualbox)
+worker-1                  running (virtualbox)
+worker-2                  running (virtualbox)
+```
+
+### Machines ip address
 
 | Machine Name  | IP Address      |
 |---------------|-----------------|
@@ -12,64 +44,36 @@
 | worker-1      | 192.168.100.21  |
 | worker-2      | 192.168.100.22  |
 
-## Google Cloud Platform
 
-This tutorial leverages the [Google Cloud Platform](https://cloud.google.com/) to streamline provisioning of the compute infrastructure required to bootstrap a Kubernetes cluster from the ground up. [Sign up](https://cloud.google.com/free/) for $300 in free credits.
+## Configure HAPROXY LB
 
-[Estimated cost](https://cloud.google.com/products/calculator#id=873932bc-0840-4176-b0fa-a8cfd4ca61ae) to run this tutorial: $0.23 per hour ($5.50 per day).
-
-> The compute resources required for this tutorial exceed the Google Cloud Platform free tier.
-
-## Google Cloud Platform SDK
-
-### Install the Google Cloud SDK
-
-Follow the Google Cloud SDK [documentation](https://cloud.google.com/sdk/) to install and configure the `gcloud` command line utility.
-
-Verify the Google Cloud SDK version is 338.0.0 or higher:
+ssh to the haproxy-lb VM
+```
+vagrant ssh haproxy-lb
+```
+After that configure the backend and frontend in the lb
 
 ```
-gcloud version
+nano /etc/haproxy/haproxy.cfg
+
+##############################################
+frontend k8s
+  bind 192.168.100.30:80
+  mode tcp
+  default_backend k8s
+
+backend k8s
+  balance roundrobin
+  mode tcp
+  option tcplog
+  option tcp-check
+  server controller-0 192.168.100.10:80 check
+  server controller-1 192.168.100.11:80 check
+  server controller-2 192.168.100.12:80 check
+##############################################
+
+systemctl enable haproxy
+systemctl start haproxy
 ```
-
-### Set a Default Compute Region and Zone
-
-This tutorial assumes a default compute region and zone have been configured.
-
-If you are using the `gcloud` command-line tool for the first time `init` is the easiest way to do this:
-
-```
-gcloud init
-```
-
-Then be sure to authorize gcloud to access the Cloud Platform with your Google user credentials:
-
-```
-gcloud auth login
-```
-
-Next set a default compute region and compute zone:
-
-```
-gcloud config set compute/region us-west1
-```
-
-Set a default compute zone:
-
-```
-gcloud config set compute/zone us-west1-c
-```
-
-> Use the `gcloud compute zones list` command to view additional regions and zones.
-
-## Running Commands in Parallel with tmux
-
-[tmux](https://github.com/tmux/tmux/wiki) can be used to run commands on multiple compute instances at the same time. Labs in this tutorial may require running the same commands across multiple compute instances, in those cases consider using tmux and splitting a window into multiple panes with synchronize-panes enabled to speed up the provisioning process.
-
-> The use of tmux is optional and not required to complete this tutorial.
-
-![tmux screenshot](images/tmux-screenshot.png)
-
-> Enable synchronize-panes by pressing `ctrl+b` followed by `shift+:`. Next type `set synchronize-panes on` at the prompt. To disable synchronization: `set synchronize-panes off`.
 
 Next: [Installing the Client Tools](02-client-tools.md)
