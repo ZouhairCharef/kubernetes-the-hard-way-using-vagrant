@@ -63,4 +63,4 @@ worker-1   Ready    <none>   2m35s   v1.21.0
 worker-2   Ready    <none>   2m35s   v1.21.0
 ```
 
-Next: [Provisioning Pod Network Routes](11-pod-network-routes.md)
+Next: [Provisioning Pod Network Routes](10-pod-network-routes.md)
