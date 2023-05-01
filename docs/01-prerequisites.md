@@ -1,5 +1,17 @@
 # Prerequisites
 
+## Machines ip address
+
+| Machine Name  | IP Address      |
+|---------------|-----------------|
+| haproxy-lb    | 192.168.100.30  |
+| controller-0  | 192.168.100.10  |
+| controller-1  | 192.168.100.11  |
+| controller-2  | 192.168.100.12  |
+| worker-0      | 192.168.100.20  |
+| worker-1      | 192.168.100.21  |
+| worker-2      | 192.168.100.22  |
+
 ## Google Cloud Platform
 
 This tutorial leverages the [Google Cloud Platform](https://cloud.google.com/) to streamline provisioning of the compute infrastructure required to bootstrap a Kubernetes cluster from the ground up. [Sign up](https://cloud.google.com/free/) for $300 in free credits.
