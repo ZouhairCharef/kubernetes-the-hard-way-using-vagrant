@@ -6,6 +6,18 @@ Kubernetes The Hard Way is optimized for learning, which means taking the long r
 
 > The results of this tutorial should not be viewed as production ready, and may receive limited support from the community, but don't let that stop you from learning!
 
+## machines ip adress
+
+| Machine Name  | IP Address      |
+|---------------|-----------------|
+| haproxy-lb    | 192.168.100.30  |
+| controller-0  | 192.168.100.10  |
+| controller-1  | 192.168.100.11  |
+| controller-2  | 192.168.100.12  |
+| worker-0      | 192.168.100.20  |
+| worker-1      | 192.168.100.21  |
+| worker-2      | 192.168.100.22  |
+
 ## Copyright
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
