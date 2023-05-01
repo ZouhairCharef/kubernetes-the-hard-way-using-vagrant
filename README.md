@@ -1,4 +1,4 @@
-# Kubernetes The Hard Way
+# Kubernetes The Hard Way using vagrant
 
 This tutorial walks you through setting up Kubernetes the hard way. This guide is not for people looking for a fully automated command to bring up a Kubernetes cluster.
 
