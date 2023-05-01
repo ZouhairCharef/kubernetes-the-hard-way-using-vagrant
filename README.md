@@ -6,28 +6,17 @@ Kubernetes The Hard Way is optimized for learning, which means taking the long r
 
 > The results of this tutorial should not be viewed as production ready, and may receive limited support from the community, but don't let that stop you from learning!
 
-## Machines ip address
-
-| Machine Name  | IP Address      |
-|---------------|-----------------|
-| haproxy-lb    | 192.168.100.30  |
-| controller-0  | 192.168.100.10  |
-| controller-1  | 192.168.100.11  |
-| controller-2  | 192.168.100.12  |
-| worker-0      | 192.168.100.20  |
-| worker-1      | 192.168.100.21  |
-| worker-2      | 192.168.100.22  |
 
 ## Cluster Details
 
 Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
-
 
 * [kubernetes](https://github.com/kubernetes/kubernetes) v1.25.0
 * [containerd](https://github.com/containerd/containerd) v1.6.20
 * [coredns](https://github.com/coredns/coredns) v1.10.0
 * [cni](https://github.com/containernetworking/cni) v1.1.1
 * [etcd](https://github.com/etcd-io/etcd) v3.4.25
+
 
 ## Labs
 
