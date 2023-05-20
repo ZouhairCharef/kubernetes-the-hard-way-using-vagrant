@@ -132,17 +132,30 @@ cat > ${instance}-csr.json <<EOF
 }
 EOF
 
-EXTERNAL_IP=$(gcloud compute instances describe ${instance} \
-  --format 'value(networkInterfaces[0].accessConfigs[0].natIP)')
+# Set the VAGRANT_DIR variable to the current directory
+VAGRANT_DIR=$(pwd)
 
-INTERNAL_IP=$(gcloud compute instances describe ${instance} \
-  --format 'value(networkInterfaces[0].networkIP)')
+EXTERNAL_IP=$(
+# Get a list of all running Vagrant machines
+vagrant_status=$(vagrant status | awk ' /${instance}/ && /running/ {print $1}')
+
+# Loop through each running machine and retrieve its IP address from the private network
+for machine in $vagrant_status; do
+  ip_address=$(vagrant ssh $machine -c "ip -o -4 addr show eth1 | awk '{split(\$4,a,\"/\"); print a[1]}'" 2>/dev/null)
+
+  if [ -n "$ip_address" ]; then
+    echo "$ip_address"
+  else
+    echo "Failed to retrieve IP address for machine '$machine'"
+  fi
+done
+)
 
 cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
   -config=ca-config.json \
-  -hostname=${instance},${EXTERNAL_IP},${INTERNAL_IP} \
+  -hostname=${instance},${EXTERNAL_IP} \
   -profile=kubernetes \
   ${instance}-csr.json | cfssljson -bare ${instance}
 done
@@ -299,9 +312,7 @@ Generate the Kubernetes API Server certificate and private key:
 ```
 {
 
-KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-hard-way \
-  --region $(gcloud config get-value compute/region) \
-  --format 'value(address)')
+KUBERNETES_PUBLIC_ADDRESS=192.168.100.30 # haproxy ip address
 
 KUBERNETES_HOSTNAMES=kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 
@@ -328,10 +339,10 @@ cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
   -config=ca-config.json \
-  -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,${KUBERNETES_PUBLIC_ADDRESS},127.0.0.1,${KUBERNETES_HOSTNAMES} \
+  -hostname=192.168.100.10,192.168.100.11,192.168.100.12,${KUBERNETES_PUBLIC_ADDRESS},127.0.0.1,${KUBERNETES_HOSTNAMES} \ # controllers ip address
   -profile=kubernetes \
   kubernetes-csr.json | cfssljson -bare kubernetes
-
+  
 }
 ```
 
@@ -395,17 +406,36 @@ service-account.pem
 Copy the appropriate certificates and private keys to each worker instance:
 
 ```
-for instance in worker-0 worker-1 worker-2; do
-  gcloud compute scp ca.pem ${instance}-key.pem ${instance}.pem ${instance}:~/
+# Array of machine names
+machines=("worker-0" "worker-1" "worker-2")
+
+vagrant plugin install vagrant-scp
+
+# Loop through the machine names
+for machine in "${machines[@]}"
+do
+  # Copy files to the Vagrant machine
+  vagrant scp ./ca.pem ${machine}:/home/vagrant/
+  vagrant scp ./${machine}-key.pem ${machine}:/home/vagrant/
+  vagrant scp ./${machine}.pem ${machine}:/home/vagrant/
 done
 ```
 
 Copy the appropriate certificates and private keys to each controller instance:
 
 ```
-for instance in controller-0 controller-1 controller-2; do
-  gcloud compute scp ca.pem ca-key.pem kubernetes-key.pem kubernetes.pem \
-    service-account-key.pem service-account.pem ${instance}:~/
+# Array of machine names
+machines=("worker-0" "worker-1" "worker-2")
+
+vagrant plugin install vagrant-scp
+
+# Loop through the machine names
+for machine in "${machines[@]}"
+do
+  # Copy files to the Vagrant machine
+  vagrant scp ./ca.pem ${machine}:/home/vagrant/
+  vagrant scp ./${machine}-key.pem ${machine}:/home/vagrant/
+  vagrant scp ./${machine}.pem ${machine}:/home/vagrant/
 done
 ```
 
