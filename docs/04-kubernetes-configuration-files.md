@@ -13,9 +13,7 @@ Each kubeconfig requires a Kubernetes API Server to connect to. To support high 
 Retrieve the `kubernetes-the-hard-way` static IP address:
 
 ```
-KUBERNETES_PUBLIC_ADDRESS=$(gcloud compute addresses describe kubernetes-the-hard-way \
-  --region $(gcloud config get-value compute/region) \
-  --format 'value(address)')
+KUBERNETES_PUBLIC_ADDRESS=192.168.100.30 # haproxy ip address
 ```
 
 ### The kubelet Kubernetes Configuration File
@@ -198,16 +196,31 @@ admin.kubeconfig
 Copy the appropriate `kubelet` and `kube-proxy` kubeconfig files to each worker instance:
 
 ```
-for instance in worker-0 worker-1 worker-2; do
-  gcloud compute scp ${instance}.kubeconfig kube-proxy.kubeconfig ${instance}:~/
+# Array of machine names
+machines=("worker-0" "worker-1" "worker-2")
+
+# Loop through the machine names
+for machine in "${machines[@]}"
+do
+  # Copy kubeconfig files to the Vagrant machine
+  vagrant scp ./${machine}.kubeconfig ${machine}:/home/vagrant/
+  vagrant scp ./kube-proxy.kubeconfig ${machine}:/home/vagrant/
 done
 ```
 
 Copy the appropriate `kube-controller-manager` and `kube-scheduler` kubeconfig files to each controller instance:
 
 ```
-for instance in controller-0 controller-1 controller-2; do
-  gcloud compute scp admin.kubeconfig kube-controller-manager.kubeconfig kube-scheduler.kubeconfig ${instance}:~/
+# Array of machine names
+machines=("controller-0" "controller-1" "controller-2")
+
+# Loop through the machine names
+for machine in "${machines[@]}"
+do
+  # Copy kubeconfig files to the Vagrant machine
+  vagrant scp ./admin.kubeconfig ${machine}:/home/vagrant/
+  vagrant scp ./kube-controller-manager.kubeconfig ${machine}:/home/vagrant/
+  vagrant scp ./kube-scheduler.kubeconfig ${machine}:/home/vagrant/
 done
 ```
 

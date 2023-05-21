@@ -35,8 +35,14 @@ EOF
 Copy the `encryption-config.yaml` encryption config file to each controller instance:
 
 ```
-for instance in controller-0 controller-1 controller-2; do
-  gcloud compute scp encryption-config.yaml ${instance}:~/
+# Array of machine names
+machines=("controller-0" "controller-1" "controller-2")
+
+# Loop through the machine names
+for machine in "${machines[@]}"
+do
+  # Copy encryption-config.yaml file to the Vagrant machine
+  vagrant scp ./encryption-config.yaml ${machine}:/home/vagrant/
 done
 ```
 
